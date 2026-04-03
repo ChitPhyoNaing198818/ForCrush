@@ -303,6 +303,11 @@ function handleNo() {
     const currentMeme = localNoMemes[(noCount - 1) % localNoMemes.length];
     memeDisplay.src = currentMeme;
 
+    memeDisplay.onerror = function() {
+    this.src = "meme1.gif"; // fallback
+    this.onerror = null;
+};
+
     // Scale buttons
     const yesScale = 1 + (noCount * 0.45);
     yesBtn.style.transform = `scale(${yesScale})`;

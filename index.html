@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Will You Be Mine?</title>
+    <style>
+        :root {
+            --primary: #ff4d6d;
+            --secondary: #ff758f;
+            --accent: #ffb3c1;
+            --glass: rgba(255, 255, 255, 0.85);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Pyidaungsu', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(-45deg, #fff5f6, #ffe3e8, #ffccd5, #fff0f3);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            padding: 20px;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        #bg-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .floating-heart {
+            position: absolute;
+            color: var(--accent);
+            opacity: 0.3;
+            animation: floatUp var(--duration) linear infinite;
+            filter: blur(1px);
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(110vh) rotate(0deg) scale(1); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-10vh) rotate(360deg) scale(1.5); opacity: 0; }
+        }
+
+        .card-container {
+            width: 100%;
+            max-width: 420px;
+            z-index: 10;
+            perspective: 1000px;
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 40px 25px;
+            border-radius: 40px;
+            box-shadow: 0 25px 50px -12px rgba(255, 77, 109, 0.25);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 520px;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            transform-style: preserve-3d;
+        }
+
+        .meme-container {
+            width: 160px;
+            height: 160px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .meme-container::after {
+            content: '';
+            position: absolute;
+            inset: -10px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 35px;
+            z-index: -1;
+            opacity: 0.2;
+            filter: blur(10px);
+        }
+
+        .meme-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 30px;
+            border: 4px solid white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .typing-container {
+            height: 90px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 10px;
+        }
+
+        #love-letter {
+            font-size: 1.3rem;
+            color: #333;
+            font-weight: 700;
+            line-height: 1.5;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .buttons-wrapper {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            min-height: 120px;
+            justify-content: center;
+            position: relative;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .buttons-wrapper.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .btn {
+            border-radius: 25px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            box-shadow: 0 10px 20px rgba(255, 77, 109, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            outline: none;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        #yesBtn {
+            padding: 16px 35px;
+            font-size: 19px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            min-width: 150px;
+            z-index: 1000;
+        }
+
+        #noBtn {
+            padding: 12px 28px;
+            background: white;
+            color: #ff4d6d;
+            border: 1px solid #ffe3e8;
+            font-size: 15px;
+            z-index: 100;
+        }
+
+        .hidden { display: none !important; }
+
+        #confetti-canvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2000;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="bg-elements"></div>
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="card-container">
+        <div class="card" id="mainCard">
+            <div class="meme-container">
+                <img id="memeDisplay" src="img/talk.gif" class="meme-img" alt="Cute Cat">
+            </div>
+            
+            <div class="typing-container">
+                <span id="love-letter"></span>
+            </div>
+            
+            <div class="buttons-wrapper" id="btnContainer">
+                <button id="yesBtn" class="btn">ချစ်တယ် ❤️</button>
+                <button id="noBtn" class="btn">ဟင့်အင်း</button>
+            </div>
+        </div>
+
+        <div class="card hidden" id="successCard">
+            <div class="meme-container">
+                <img src="img/sucess.gif" class="meme-img" alt="Success Cat" id="successMeme">
+            </div>
+            <h1 style="color: var(--primary); font-size: 2.2rem; margin-bottom: 15px; animation: pop 0.5s ease;">I Love You Too Much ❤️</h1>
+            <p style="color: #444; line-height: 1.6; font-size: 1.1rem; padding: 0 20px;">
+                ကမ္ဘာပေါ်မှာ အပျော်ဆုံးလူသားက ကိုယ်ပါပဲကွယ်။<br>
+                 အမြဲတမ်း ဂရုစိုက်သွားမှာပါနော်။
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const loveLetterElement = document.getElementById('love-letter');
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const btnContainer = document.getElementById('btnContainer');
+        const mainCard = document.getElementById('mainCard');
+        const successCard = document.getElementById('successCard');
+        const memeDisplay = document.getElementById('memeDisplay');
+        const bgContainer = document.getElementById('bg-elements');
+
+        const messages = [
+            "ဟိုင်း... Crushလေးရေ ❤️",
+            "ကိုယ် မင်းကို ပြောစရာရှိတယ်...",
+            "မင်းနဲ့တွေ့ဆုံခွင့်ရတာကလေ ဘ၀မှာအကောင်းဆုံးဆုပါပဲ",
+            "မင်းဘေးနားမှာပဲနေပြီး မင်းကိုကာကွယ်စောင့်ရှောက်ပေးချင်ပါတယ်",
+            "မင်းအပေါ်ကျမဲ့ ကံဆိုးခြင်းတွေကို ကိုယ့်အပေါ်ပဲကျစေချင်တယ်",
+            "ကိုယ့်အပေါ်ကျမဲ့ ကံကောင်းခြင်းတွေကို မင်းအပေါ်ကိုပဲကျစေချင်ပါတယ်",
+            "ကိုယ် မင်းကို ကိုယ့်အသက်လောက်ချစ်တယ်",
+            "မင်းရောကိုယ့်ကို ပြန်ချစ်နိုင်မလား"
+        ];
+
+        const noPhrases = [
+            "ဟင့်အင်း", "သေချာလို့လား? 🥺", "ထပ်စဉ်းစားပါဦး", "တကယ်ကြီးလား?",
+            "မှားနှိပ်တာလား?", "တစ်ခါလောက်ပဲ", "မနှိပ်ပါနဲ့နော်", "စိတ်မကောင်းဖြစ်သွားပြီ", "Yes ကိုပဲနှိပ်ပါ"
+        ];
+
+        // --- သင့်ရဲ့ Local Meme File နာမည်များကို ဒီမှာထည့်ပါ ---
+        const localNoMemes = [
+            "img/meme1.gif",
+            "img/meme2.gif",
+            "img/meme3.gif",
+            "img/meme4.gif"
+            
+        ];
+
+        // Backup Online Memes (Local ပုံမရှိရင် ဒါကိုပြပေးမယ်)
+        const backupNoMemes = [
+            "https://media.tenor.com/YUzRkMOL-3EAAAAj/cat-sad-eyes.gif",
+            "https://media.tenor.com/3xQ7kG9r2WMAAAAj/cat-please.gif",
+            "https://media.tenor.com/j5kFJxXKXJ0AAAAj/cat-beg.gif",
+            "https://media.tenor.com/l1DkK8Z6z7AAAAAj/cat-crying-hard.gif"
+        ];
+
+        let msgIndex = 0;
+        let charIndex = 0;
+        let noCount = 0;
+        let isDeleting = false;
+
+        function type() {
+            const currentMsg = messages[msgIndex];
+            if (isDeleting) {
+                loveLetterElement.textContent = currentMsg.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                loveLetterElement.textContent = currentMsg.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            let typeSpeed = isDeleting ? 20 : 40;
+            if (!isDeleting && charIndex === currentMsg.length) {
+                if (msgIndex === messages.length - 1) {
+                    btnContainer.classList.add('show');
+                    return; 
+                }
+                isDeleting = true;
+                typeSpeed = 1500; 
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                msgIndex++;
+                typeSpeed = 1000;
+            }
+            setTimeout(type, typeSpeed);
+        }
+
+        function createFloatingHearts() {
+            const heartIcons = ['❤️', '💖', '🌸', '✨', '💕'];
+            for (let i = 0; i < 15; i++) {
+                const h = document.createElement('div');
+                h.className = 'floating-heart';
+                h.textContent = heartIcons[Math.floor(Math.random() * heartIcons.length)];
+                h.style.left = Math.random() * 100 + 'vw';
+                h.style.fontSize = (Math.random() * 20 + 15) + 'px';
+                h.style.setProperty('--duration', (Math.random() * 10 + 10) + 's');
+                h.style.animationDelay = (Math.random() * 10) + 's';
+                bgContainer.appendChild(h);
+            }
+        }
+
+        function handleNo() {
+            noCount++;
+            noBtn.textContent = noPhrases[Math.min(noCount, noPhrases.length - 1)];
+            
+            // Local Meme ပြောင်းလဲခြင်း logic
+            const currentMeme = noCount <= localNoMemes.length ? localNoMemes[noCount - 1] : backupNoMemes[noCount % backupNoMemes.length];
+            memeDisplay.src = currentMeme;
+
+            // Local ပုံ error တက်ရင် Online Backup ပြရန်
+            memeDisplay.onerror = function() {
+                this.src = backupNoMemes[noCount % backupNoMemes.length];
+                this.onerror = null;
+
+            console.log("Trying to show meme:", currentMeme);
+            };
+
+            const yesScale = 1 + (noCount * 0.45);
+            yesBtn.style.transform = `scale(${yesScale})`;
+            
+            const noScale = Math.max(0.4, 1 - (noCount * 0.08));
+            noBtn.style.transform = `scale(${noScale})`;
+
+            mainCard.style.transform = 'translateX(' + (Math.random() * 10 - 5) + 'px) rotate(' + (Math.random() * 2 - 1) + 'deg)';
+            setTimeout(() => mainCard.style.transform = 'none', 100);
+            
+            if (noCount > 12) noBtn.style.display = 'none';
+        }
+
+        function startCelebration() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = Array.from({ length: 150 }).map(() => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                size: Math.random() * 8 + 4,
+                speed: Math.random() * 3 + 2,
+                color: `hsl(${Math.random() * 30 + 340}, 100%, 70%)`,
+                rotation: Math.random() * 360,
+                rSpeed: Math.random() * 5 - 2.5
+            }));
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.y += p.speed;
+                    p.rotation += p.rSpeed;
+                    if (p.y > canvas.height) p.y = -20;
+                    
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rotation * Math.PI / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                    ctx.restore();
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        noBtn.addEventListener('click', handleNo);
+
+        yesBtn.addEventListener('click', () => {
+            mainCard.classList.add('hidden');
+            successCard.classList.remove('hidden');
+            btnContainer.classList.add('hidden');
+            
+            // Success Card အတွက်လည်း Local image ရှိရင် error handle လုပ်ပေးထားပါတယ်
+            const successMeme = document.getElementById('successMeme');
+            successMeme.onerror = function() {
+                this.src = "https://media.tenor.com/z91X_Zp_Ym0AAAAj/happy-cat-happy-happy-happy.gif";
+                this.onerror = null;
+            };
+            
+            startCelebration();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (window.innerWidth < 768) return;
+            const x = (window.innerWidth / 2 - e.pageX) / 25;
+            const y = (window.innerHeight / 2 - e.pageY) / 25;
+            mainCard.style.transform = `rotateY(${-x}deg) rotateX(${y}deg)`;
+        });
+
+        window.onload = () => {
+            type();
+            createFloatingHearts();
+        };
+
+        
+
+
+    </script>
+</body>
+</html>

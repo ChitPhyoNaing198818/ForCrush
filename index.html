@@ -324,9 +324,7 @@
             memeDisplay.src = currentMeme;
 
             // Local ပုံ error တက်ရင် Online Backup ပြရန်
-            memeDisplay.onerror = function() {
-                this.src = backupNoMemes[noCount % backupNoMemes.length];
-                this.onerror = null;
+            
 
             console.log("Trying to show meme:", currentMeme);
             };

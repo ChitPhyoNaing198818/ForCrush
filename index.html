@@ -283,19 +283,28 @@ function createFloatingHearts() {
     }
 }
 
-function handleNo(){
+function handleNo() {
     noCount++;
-    noBtn.textContent=noPhrases[Math.min(noCount,noPhrases.length-1)];
+    // Update the "No" button text
+    noBtn.textContent = noPhrases[Math.min(noCount, noPhrases.length - 1)];
+    
+    // Cycle through local memes
+    const currentMeme = localNoMemes[(noCount - 1) % localNoMemes.length];
+    memeDisplay.src = currentMeme;
 
-    // Test a single meme directly
-    memeDisplay.src = "meme1.gif"; 
+    // Scale the Yes button bigger and No button smaller
+    const yesScale = 1 + (noCount * 0.45);
+    yesBtn.style.transform = `scale(${yesScale})`;
+    
+    const noScale = Math.max(0.4, 1 - (noCount * 0.08));
+    noBtn.style.transform = `scale(${noScale})`;
 
-    console.log("Attempting to show:", memeDisplay.src);
-
-    const yesScale=1+(noCount*0.45);
-    yesBtn.style.transform=`scale(${yesScale})`;
-    const noScale=Math.max(0.4,1-(noCount*0.08));
-    noBtn.style.transform=`scale(${noScale})`;
+    // Tiny shake effect on the card
+    mainCard.style.transform = 'translateX(' + (Math.random() * 10 - 5) + 'px) rotate(' + (Math.random() * 2 - 1) + 'deg)';
+    setTimeout(() => mainCard.style.transform = 'none', 100);
+    
+    // Hide No button after too many clicks
+    if (noCount > 12) noBtn.style.display = 'none';
 }
 
 function startCelebration(){

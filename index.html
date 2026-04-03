@@ -286,15 +286,16 @@ function createFloatingHearts() {
 function handleNo(){
     noCount++;
     noBtn.textContent=noPhrases[Math.min(noCount,noPhrases.length-1)];
-    const currentMeme=localNoMemes[Math.min(noCount-1,localNoMemes.length-1)];
-    memeDisplay.src=currentMeme;
+
+    // Test a single meme directly
+    memeDisplay.src = "meme1.gif"; 
+
+    console.log("Attempting to show:", memeDisplay.src);
+
     const yesScale=1+(noCount*0.45);
     yesBtn.style.transform=`scale(${yesScale})`;
     const noScale=Math.max(0.4,1-(noCount*0.08));
     noBtn.style.transform=`scale(${noScale})`;
-    mainCard.style.transform='translateX('+(Math.random()*10-5)+'px) rotate('+(Math.random()*2-1)+'deg)';
-    setTimeout(()=>mainCard.style.transform='none',100);
-    if(noCount>12) noBtn.style.display='none';
 }
 
 function startCelebration(){

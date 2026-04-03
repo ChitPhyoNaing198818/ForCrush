@@ -237,13 +237,21 @@ const noPhrases = [
     "မှားနှိပ်တာလား?", "တစ်ခါလောက်ပဲ", "မနှိပ်ပါနဲ့နော်", "စိတ်မကောင်းဖြစ်သွားပြီ", "Yes ကိုပဲနှိပ်ပါ"
 ];
 
-const localNoMemes = ["meme1.gif","meme2.gif","meme3.gif","meme4.gif"];
+// Local meme files (make sure all exist in same folder as index.html)
+const localNoMemes = ["meme1.gif", "meme2.gif", "meme3.gif", "meme4.gif"];
+
+// Preload all memes to prevent flicker
+localNoMemes.forEach(src => {
+    const img = new Image();
+    img.src = src;
+});
 
 let msgIndex = 0;
 let charIndex = 0;
 let noCount = 0;
 let isDeleting = false;
 
+// Typing effect for love letter
 function type() {
     const currentMsg = messages[msgIndex];
     if (isDeleting) {
@@ -253,6 +261,7 @@ function type() {
         loveLetterElement.textContent = currentMsg.substring(0, charIndex + 1);
         charIndex++;
     }
+
     let typeSpeed = isDeleting ? 20 : 40;
     if (!isDeleting && charIndex === currentMsg.length) {
         if (msgIndex === messages.length - 1) {
@@ -269,37 +278,39 @@ function type() {
     setTimeout(type, typeSpeed);
 }
 
+// Floating hearts animation
 function createFloatingHearts() {
-    const heartIcons = ['❤️','💖','🌸','✨','💕'];
-    for(let i=0;i<15;i++){
-        const h=document.createElement('div');
-        h.className='floating-heart';
-        h.textContent=heartIcons[Math.floor(Math.random()*heartIcons.length)];
-        h.style.left=Math.random()*100+'vw';
-        h.style.fontSize=(Math.random()*20+15)+'px';
-        h.style.setProperty('--duration',(Math.random()*10+10)+'s');
-        h.style.animationDelay=(Math.random()*10)+'s';
+    const heartIcons = ['❤️', '💖', '🌸', '✨', '💕'];
+    for (let i = 0; i < 15; i++) {
+        const h = document.createElement('div');
+        h.className = 'floating-heart';
+        h.textContent = heartIcons[Math.floor(Math.random() * heartIcons.length)];
+        h.style.left = Math.random() * 100 + 'vw';
+        h.style.fontSize = (Math.random() * 20 + 15) + 'px';
+        h.style.setProperty('--duration', (Math.random() * 10 + 10) + 's');
+        h.style.animationDelay = (Math.random() * 10) + 's';
         bgContainer.appendChild(h);
     }
 }
 
+// Handle clicking "No" button
 function handleNo() {
     noCount++;
-    // Update the "No" button text
+    // Update "No" button text
     noBtn.textContent = noPhrases[Math.min(noCount, noPhrases.length - 1)];
     
     // Cycle through local memes
     const currentMeme = localNoMemes[(noCount - 1) % localNoMemes.length];
     memeDisplay.src = currentMeme;
 
-    // Scale the Yes button bigger and No button smaller
+    // Scale buttons
     const yesScale = 1 + (noCount * 0.45);
     yesBtn.style.transform = `scale(${yesScale})`;
     
     const noScale = Math.max(0.4, 1 - (noCount * 0.08));
     noBtn.style.transform = `scale(${noScale})`;
 
-    // Tiny shake effect on the card
+    // Tiny card shake
     mainCard.style.transform = 'translateX(' + (Math.random() * 10 - 5) + 'px) rotate(' + (Math.random() * 2 - 1) + 'deg)';
     setTimeout(() => mainCard.style.transform = 'none', 100);
     
@@ -307,31 +318,35 @@ function handleNo() {
     if (noCount > 12) noBtn.style.display = 'none';
 }
 
-function startCelebration(){
-    const canvas=document.getElementById('confetti-canvas');
-    const ctx=canvas.getContext('2d');
-    canvas.width=window.innerWidth;
-    canvas.height=window.innerHeight;
-    const particles=Array.from({length:150}).map(()=>({
-        x:Math.random()*canvas.width,
-        y:Math.random()*canvas.height-canvas.height,
-        size:Math.random()*8+4,
-        speed:Math.random()*3+2,
-        color:`hsl(${Math.random()*30+340},100%,70%)`,
-        rotation:Math.random()*360,
-        rSpeed:Math.random()*5-2.5
+// Confetti celebration
+function startCelebration() {
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const particles = Array.from({ length: 150 }).map(() => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        size: Math.random() * 8 + 4,
+        speed: Math.random() * 3 + 2,
+        color: `hsl(${Math.random() * 30 + 340}, 100%, 70%)`,
+        rotation: Math.random() * 360,
+        rSpeed: Math.random() * 5 - 2.5
     }));
-    function animate(){
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        particles.forEach(p=>{
-            p.y+=p.speed;
-            p.rotation+=p.rSpeed;
-            if(p.y>canvas.height)p.y=-20;
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+            p.y += p.speed;
+            p.rotation += p.rSpeed;
+            if (p.y > canvas.height) p.y = -20;
+            
             ctx.save();
-            ctx.translate(p.x,p.y);
-            ctx.rotate(p.rotation*Math.PI/180);
-            ctx.fillStyle=p.color;
-            ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size);
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rotation * Math.PI / 180);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
             ctx.restore();
         });
         requestAnimationFrame(animate);
@@ -339,26 +354,41 @@ function startCelebration(){
     animate();
 }
 
-noBtn.addEventListener('click',handleNo);
+// Event listeners
+noBtn.addEventListener('click', handleNo);
 
-yesBtn.addEventListener('click',()=>{
+yesBtn.addEventListener('click', () => {
     mainCard.classList.add('hidden');
     successCard.classList.remove('hidden');
     btnContainer.classList.add('hidden');
+    
+    const successMeme = document.getElementById('successMeme');
+    successMeme.onerror = function() {
+        this.src = "sucess.gif"; // Local fallback
+        this.onerror = null;
+    };
+    
     startCelebration();
 });
 
-document.addEventListener('mousemove',(e)=>{
-    if(window.innerWidth<768) return;
-    const x=(window.innerWidth/2-e.pageX)/25;
-    const y=(window.innerHeight/2-e.pageY)/25;
-    mainCard.style.transform=`rotateY(${-x}deg) rotateX(${y}deg)`;
+// Mouse parallax effect
+document.addEventListener('mousemove', (e) => {
+    if (window.innerWidth < 768) return;
+    const x = (window.innerWidth / 2 - e.pageX) / 25;
+    const y = (window.innerHeight / 2 - e.pageY) / 25;
+    mainCard.style.transform = `rotateY(${-x}deg) rotateX(${y}deg)`;
 });
 
-window.onload=()=>{
+// Start everything
+window.onload = () => {
     type();
     createFloatingHearts();
 };
 </script>
+
+
+
+
+  
 </body>
 </html>

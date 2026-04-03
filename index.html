@@ -154,12 +154,14 @@ body {
     transform: scale(0.95);
 }
 #yesBtn {
-    padding: 16px 35px;
-    font-size: 19px;
+    padding: 12px 25px;       /* Smaller padding for mobile */
+    font-size: clamp(16px, 4vw, 20px); /* Responsive font size */
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: white;
-    min-width: 150px;
+    min-width: 120px;         /* Keeps button tappable on mobile */
+    max-width: 80%;           /* Avoid overflowing on small screens */
     z-index: 1000;
+    flex-shrink: 0;           /* Prevent button from shrinking */
 }
 #noBtn {
     padding: 12px 28px;
